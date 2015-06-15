@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>RegFormatter</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="regformatter.js"></script>
+</head>
+<body>
+    <div class="container">
+        <br />
+        <h1 class="text-center">RegFormatter</h1>
+        <br />
+        <h2>Examples</h2>
+        <hr />
+        <div class="form-group">
+            <label for="phone" class="control-label">Phone number</label>
+            <input type="text" id="phone" value="79876543210" class="form-control" />
+            <br />
+            <code>var phone = new RegFormatter({ element: document.getElementById('phone'), format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%" });</code>
+            <script>
+                var phone = new RegFormatter({
+                    element: document.getElementById('phone'),
+                    format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
+                });
+            </script>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="cardnumber" class="control-label">Credit card number</label>
+            <input type="text" id="cardnumber" value="1234567890123456" class="form-control"/>
+            <br/>
+            <code>var cardNumber = new RegFormatter({ element: document.getElementById('cardnumber'), format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%" });</code>
+            <script>
+                var cardNumber = new RegFormatter({
+                    element: document.getElementById('cardnumber'),
+                    format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
+                });
+            </script>
+        </div>
+        <br/>
+        <div class="form-group">
+            <label for="carddate" class="control-label">Credit card expire date</label>
+            <input type="text" id="carddate" value="1234" class="form-control" />
+            <br />
+            <code>var cardDate = new RegFormatter({ element: document.getElementById('carddate'), format: "%[01]\\d%\/%\\d{2}%" });</code>
+            <script>
+                var cardDate = new RegFormatter({
+                    element: document.getElementById('carddate'),
+                    format: "%[01]\\d%\/%\\d{2}%"
+                });
+            </script>
+        </div>
+        <br />
+
+        <h2>Constructor</h2>
+        <hr/>
+        <p class="lead"><strong>new RegFormatter(obj)</strong></p>
+        <p class="text-muted"><strong><mark>obj.element</mark></strong> - INPUT element (optional parameter)</p>
+        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>obj.element</mark></p>
+        <br />
+
+        <h2>Instance methods</h2>
+        <hr />
+        <p class="lead"><strong>value(val)</strong> returns the input value without formatting</p>
+        <p class="text-muted"><strong><mark>val</mark></strong> - formatted value (optional parameter, <mark>element.value</mark> by default)</p>
+        <p><code>phone.value();</code></p>
+        <div class="well well-sm" id="phoneValue"></div>
+        <script>
+            var phoneValue = document.getElementById('phoneValue');
+            phoneValue.innerHTML = phone.value();
+            document.getElementById('phone').addEventListener('keyup', function () {
+                phoneValue.innerHTML = phone.value();
+            });
+        </script>
+        <br />
+
+        <p class="lead"><strong>write(str, value, positionStart, positionEnd)</strong> returns an object that contains the new value, which is obtained by writing <mark>str</mark> to <mark>value</mark> between position <mark>positionStart</mark> and <mark>positionEnd</mark>, and new position index</p>
+        <p class="text-muted">
+            <strong><mark>positionEnd</mark></strong> - optional parameter
+        </p>
+        <p><code>phone.write('7', document.getElementById('phone').value, 0)</code></p>
+        <div class="well well-sm" id="phoneWrite"></div>
+        <script>
+            var phoneWrite = document.getElementById('phoneWrite');
+            phoneWrite.innerHTML = JSON.stringify(phone.write('7', document.getElementById('phone').value, 0));
+            document.getElementById('phone').addEventListener('keyup', function () {
+                phoneWrite.innerHTML = JSON.stringify(phone.write('7', document.getElementById('phone').value, 0));
+            });
+        </script>
+        <br/><br/><br/><br/>
+    </div>
+</body>
+</html>
