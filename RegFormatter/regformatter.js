@@ -30,7 +30,7 @@
         var i;
 
         var addPattern = function (isExp) {
-            if (p === "" || (isExp && (brackets.length > 1 || (i + 1 < format.length && format[i + 1] === "{"))))
+            if (p === "" || (isExp && (brackets.length > 1 || (i + 1 < format.length && format.charAt(i + 1) === "{"))))
                 return;
             pattern += p;
             patterns.push(p);
@@ -40,20 +40,20 @@
 
         for (i = 0; i < format.length; i++) {
             if (backslash) {
-                p += format[i];
+                p += format.charAt(i);
                 backslash = false;
                 addPattern(exp);
                 continue;
             }
-            if (format[i] === "\\") {
-                p += format[i];
+            if (format.charAt(i) === "\\") {
+                p += format.charAt(i);
                 backslash = true;
                 continue;
             }
 
-            if (format[i] === "%") {
+            if (format.charAt(i) === "%") {
                 if (!exp) {
-                    brackets.push(format[i]);
+                    brackets.push(format.charAt(i));
                     addPattern(false);
                     exp = true;
                     continue;
@@ -64,37 +64,37 @@
                         exp = false;
                         continue;
                     } else
-                        throw "Invalid pattern '" + format + "' at position " + i + " '" + format[i] + "'";
+                        throw "Invalid pattern '" + format + "' at position " + i + " '" + format.charAt(i) + "'";
                 }
             }
 
             if (!exp) {
-                if (expSymbols.indexOf(format[i]) >= 0)
-                    p += "\\" + format[i];
+                if (expSymbols.indexOf(format.charAt(i)) >= 0)
+                    p += "\\" + format.charAt(i);
                 else
-                    p += format[i];
+                    p += format.charAt(i);
                 addPattern(false);
                 continue;
             }
 
-            if (expBegBrackets.indexOf(format[i]) >= 0) {
-                brackets.push(format[i]);
-                p += format[i];
+            if (expBegBrackets.indexOf(format.charAt(i)) >= 0) {
+                brackets.push(format.charAt(i));
+                p += format.charAt(i);
                 addPattern(true);
                 continue;
             }
 
-            if (expEndBrackets.indexOf(format[i]) >= 0) {
-                if (brackets.length && brackets[brackets.length - 1] === expBegBrackets[expEndBrackets.indexOf(format[i])]) {
+            if (expEndBrackets.indexOf(format.charAt(i)) >= 0) {
+                if (brackets.length && brackets[brackets.length - 1] === expBegBrackets[expEndBrackets.indexOf(format.charAt(i))]) {
                     brackets.pop();
-                    p += format[i];
+                    p += format.charAt(i);
                     addPattern(true);
                     continue;
                 } else
-                    throw "Invalid pattern '" + format + "' at position " + i + " '" + format[i] + "'";
+                    throw "Invalid pattern '" + format + "' at position " + i + " '" + format.charAt(i) + "'";
             }
 
-            p += format[i];
+            p += format.charAt(i);
             addPattern(true);
         }
         if (brackets.length)
