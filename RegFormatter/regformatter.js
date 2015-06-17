@@ -11,7 +11,7 @@
     function RegFormatter(obj) {
         var _this = this;
         var element = obj.element;
-        if (!element || (element.tagName.toUpperCase() !== "INPUT" && element.tagName.toUpperCase() !== "TEXTAREA"))
+        if (element && element.tagName.toUpperCase() !== "INPUT" && element.tagName.toUpperCase() !== "TEXTAREA")
             throw "Element should be <input />";
         this.element = element;
         var format = obj.format;
@@ -162,8 +162,7 @@
                 e = e || window.event;
                 var code = e.keyCode || e.charCode;
                 if (code === 8 || code === 46) {
-                    var value = _this.element.value;
-                    if (!value)
+                    if (!_this.element.value)
                         return false;
                     var sel = RegFormatter.getCaretPosition(_this.element);
                     var positionStart = sel.selectionStart;
@@ -174,9 +173,10 @@
                         else
                             positionEnd = positionStart + 1;
                     }
-                    var val = _this.write("", value, positionStart, positionEnd);
+                    var val = _this.write("", _this.element.value, positionStart, positionEnd);
                     if (val) {
                         _this.element.value = val.value;
+                        _this.oldValue = val.value;
                         if (positionStart > val.value.length)
                             positionStart = val.value.length;
                         RegFormatter.setCaretPosition(_this.element, positionStart);
@@ -196,6 +196,7 @@
                 var val = _this.write(str, _this.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
                 if (val) {
                     _this.element.value = val.value;
+                    _this.oldValue = val.value;
                     RegFormatter.setCaretPosition(_this.element, val.position + 1);
                 }
                 RegFormatter.preventEvent(e);
@@ -206,38 +207,50 @@
                 e = e || window.event;
                 var text = e.clipboardData.getData("text/plain");
                 if (text) {
-                    var value = _this.element.value;
                     var sel = RegFormatter.getCaretPosition(_this.element);
                     var positionStart = sel.selectionStart;
                     var positionEnd = sel.selectionEnd;
-                    var val = _this.write(text, value, positionStart, positionEnd === positionStart ? null : positionEnd);
+                    var val = _this.write(text, _this.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
                     if (val) {
                         _this.element.value = val.value;
-                        RegFormatter.setCaretPosition(_this.element, positionStart + val.value.length);
+                        _this.oldValue = val.value;
+                        RegFormatter.setCaretPosition(_this.element, val.position + 1);
                     }
                 }
                 RegFormatter.preventEvent(e);
                 return false;
             };
 
+            var inputEventHandler = function() {
+                var val = _this.write(_this.element.value, "", 0);
+                if (val) {
+                    _this.element.value = val.value;
+                    _this.oldValue = val.value;
+                    RegFormatter.setCaretPosition(_this.element, val.value.length);
+                } else
+                    _this.element.value = _this.oldValue;
+            }
+
             RegFormatter.addEvent(element, "keydown", keydownEventHandler);
             RegFormatter.addEvent(element, "keypress", keypressEventHandler);
             RegFormatter.addEvent(element, "paste", pasteEventHandler);
+            RegFormatter.addEvent(element, "input", inputEventHandler);
 
             var value = this.element.value;
             if (value) {
-                var val = this.write(value, "", 0, 0);
-                if (val)
-                    this.element.value = val.value;
+                var newval = this.write(value, "", 0, 0);
+                if (newval)
+                    this.element.value = newval.value;
                 else
                     this.element.value = "";
+                this.oldValue = this.element.value;
             }
         }
     }
 
     RegFormatter.addEvent = function (elem, type, func) {
         if (elem.addEventListener)
-            elem.addEventListener(type, func)
+            elem.addEventListener(type, func);
         else
             elem.attachEvent("on" + type, func);
     }
@@ -301,23 +314,23 @@
         var result = "";
         value = value != undefined ? value : (!this.element ? "" : this.element.value);
 
-        var getPattern = function (value) {
-            var pso = _this.patternsOriginal.concat();
-            pso.pop();
+        var getPatterns = function (val) {
+            var patterns = _this.patternsOriginal.concat();
+            patterns.pop();
             var ps = _this.patterns.concat();
             for (var i = 0; i < _this.patterns.length; i++) {
-                pso.push(ps.pop());
-                if (new RegExp("^" + pso.join("") + "$").test(value)) {
+                patterns.push(ps.pop());
+                if (new RegExp("^" + patterns.join("") + "$").test(val)) {
                     break;
                 } else {
-                    pso.pop();
-                    pso.pop();
+                    patterns.pop();
+                    patterns.pop();
                 }
             }
-            return pso;
+            return patterns;
         };
 
-        var pso = getPattern(value);
+        var pso = getPatterns(value);
 
         for (var i = 0; i < pso.length; i++) {
             if (this.exps[i]) {
@@ -331,6 +344,8 @@
 
     RegFormatter.prototype.write = function (str, value, positionStart, positionEnd) {
         var currentValue = this.value(value);
+        if (currentValue === "" && str === "")
+            return { value: value, position: value.length };
         var newvalue;
         var position;
         if (!positionEnd) {
