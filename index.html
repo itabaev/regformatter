@@ -13,14 +13,14 @@
     <div class="container">
         <br />
         <h1 class="text-center">
-            RegFormatter<br/>
+            RegFormatter<br />
             <small>Formatting strings by specified pattern</small>
         </h1>
-        <br/>
+        <br />
         <div class="text-center">
-            <a href="https://github.com/itabaev/regformatter/zipball/master" target="_blank" class="btn btn-default"><small>Download</small><br/>ZIP file</a>
-            <a href="https://github.com/itabaev/regformatter/tarball/master" target="_blank" class="btn btn-default"><small>Download</small><br/>TAR file</a>
-            <a href="https://github.com/itabaev/regformatter" target="_blank" class="btn btn-default"><small>View on</small><br/>GitHub</a>
+            <a href="https://github.com/itabaev/regformatter/zipball/master" target="_blank" class="btn btn-default"><small>Download</small><br>ZIP file</a>
+            <a href="https://github.com/itabaev/regformatter/tarball/master" target="_blank" class="btn btn-default"><small>Download</small><br>TAR file</a>
+            <a href="https://github.com/itabaev/regformatter" target="_blank" class="btn btn-default"><small>View on</small><br>GitHub</a>
         </div>
         <h2>Examples</h2>
         <hr />
@@ -30,8 +30,9 @@
             <br />
             <code>var phone = new RegFormatter({ element: document.getElementById('phone'), format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%" });</code>
             <script>
+                var phoneElem = document.getElementById("phone");
                 var phone = new RegFormatter({
-                    element: document.getElementById('phone'),
+                    element: phoneElem,
                     format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
                 });
             </script>
@@ -39,17 +40,17 @@
         <br />
         <div class="form-group">
             <label for="cardnumber" class="control-label">Credit card number</label>
-            <input type="text" id="cardnumber" value="1234567890123456" class="form-control"/>
-            <br/>
+            <input type="text" id="cardnumber" value="1234567890123456" class="form-control" />
+            <br />
             <code>var cardNumber = new RegFormatter({ element: document.getElementById('cardnumber'), format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%" });</code>
             <script>
                 var cardNumber = new RegFormatter({
-                    element: document.getElementById('cardnumber'),
+                    element: document.getElementById("cardnumber"),
                     format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
                 });
             </script>
         </div>
-        <br/>
+        <br />
         <div class="form-group">
             <label for="carddate" class="control-label">Credit card expire date</label>
             <input type="text" id="carddate" value="1234" class="form-control" />
@@ -57,7 +58,7 @@
             <code>var cardDate = new RegFormatter({ element: document.getElementById('carddate'), format: "%[01]\\d%\/%\\d{2}%" });</code>
             <script>
                 var cardDate = new RegFormatter({
-                    element: document.getElementById('carddate'),
+                    element: document.getElementById("carddate"),
                     format: "%[01]\\d%\/%\\d{2}%"
                 });
             </script>
@@ -65,7 +66,7 @@
         <br />
 
         <h2>Constructor</h2>
-        <hr/>
+        <hr />
         <p class="lead"><strong>new RegFormatter(obj)</strong></p>
         <p class="text-muted"><strong><mark>obj.element</mark></strong> - INPUT element (optional parameter)</p>
         <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>obj.element</mark></p>
@@ -78,11 +79,16 @@
         <p><code>phone.value();</code></p>
         <div class="well well-sm" id="phoneValue"></div>
         <script>
-            var phoneValue = document.getElementById('phoneValue');
+            var phoneValue = document.getElementById("phoneValue");
             phoneValue.innerHTML = phone.value();
-            document.getElementById('phone').addEventListener('keyup', function () {
-                phoneValue.innerHTML = phone.value();
-            });
+            if (phoneElem.addEventListener)
+                phoneElem.addEventListener("keyup", function () {
+                    phoneValue.innerHTML = phone.value();
+                });
+            else
+                phoneElem.attachEvent("onkeyup", function () {
+                    phoneValue.innerHTML = phone.value();
+                });
         </script>
         <br />
 
@@ -90,26 +96,24 @@
         <p class="text-muted">
             <strong><mark>positionEnd</mark></strong> - optional parameter
         </p>
-        <p><code>phone.write('7', document.getElementById('phone').value, 0)</code></p>
+        <p><code>phone.write("7", document.getElementById('phone').value, 0)</code></p>
         <div class="well well-sm" id="phoneWrite"></div>
         <script>
-            var phoneWrite = document.getElementById('phoneWrite');
-            phoneWrite.innerHTML = JSON.stringify(phone.write('7', document.getElementById('phone').value, 0));
-            document.getElementById('phone').addEventListener('keyup', function () {
-                phoneWrite.innerHTML = JSON.stringify(phone.write('7', document.getElementById('phone').value, 0));
-            });
+            var phoneWrite = document.getElementById("phoneWrite");
+            var write = function () {
+                var obj = phone.write("7", phoneElem.value, 0);
+                if (obj)
+                    phoneWrite.innerHTML = "{ value: \"" + obj.value + "\", position: " + obj.position + " }";
+                else
+                    phoneWrite.innerHTML = "null";
+            };
+            write();
+            if (phoneElem.addEventListener)
+                phoneElem.addEventListener("keyup", write);
+            else
+                phoneElem.attachEvent("onkeyup", write);
         </script>
-        <br/><br/><br/><br/>
+        <br /><br /><br /><br />
     </div>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-64125020-1', 'auto');
-      ga('send', 'pageview');
-
-    </script>
 </body>
 </html>

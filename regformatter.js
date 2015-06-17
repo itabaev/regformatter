@@ -1,8 +1,17 @@
 ﻿var RegFormatter = (function () {
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (searchElement, fromIndex) {
+            for (var i = (fromIndex || 0) ; i < this.length; i++)
+                if (this[i] === searchElement)
+                    return i;
+            return -1;
+        };
+    }
+
     function RegFormatter(obj) {
         var _this = this;
         var element = obj.element;
-        if (element && element.tagName.toUpperCase() !== "INPUT")
+        if (!element || (element.tagName.toUpperCase() !== "INPUT" && element.tagName.toUpperCase() !== "TEXTAREA"))
             throw "Element should be <input />";
         this.element = element;
         var format = obj.format;
@@ -149,14 +158,16 @@
         this.exps = exps;
 
         if (element) {
-            element.addEventListener("keydown", function (e) {
+            var keydownEventHandler = function (e) {
+                e = e || window.event;
                 var code = e.keyCode || e.charCode;
                 if (code === 8 || code === 46) {
                     var value = _this.element.value;
                     if (!value)
                         return false;
-                    var positionStart = _this.element.selectionStart;
-                    var positionEnd = _this.element.selectionEnd;
+                    var sel = RegFormatter.getCaretPosition(_this.element);
+                    var positionStart = sel.selectionStart;
+                    var positionEnd = sel.selectionEnd;
                     if (positionStart === positionEnd) {
                         if (code === 8)
                             positionStart--;
@@ -166,43 +177,52 @@
                     var val = _this.write("", value, positionStart, positionEnd);
                     if (val) {
                         _this.element.value = val.value;
-                        _this.element.selectionStart = _this.element.selectionEnd = positionStart;
-                        e.preventDefault();
+                        if (positionStart > val.value.length)
+                            positionStart = val.value.length;
+                        RegFormatter.setCaretPosition(_this.element, positionStart);
+                        RegFormatter.preventEvent(e);
                         return false;
                     }
                 }
                 return true;
-            });
+            };
 
-            element.addEventListener("keypress", function (e) {
-                var char = String.fromCharCode(e.keyCode || e.charCode);
-                var value = _this.element.value;
-                var positionStart = _this.element.selectionStart;
-                var positionEnd = _this.element.selectionEnd;
-                var val = _this.write(char, value, positionStart, positionEnd === positionStart ? null : positionEnd);
+            var keypressEventHandler = function (e) {
+                e = e || window.event;
+                var str = String.fromCharCode(e.keyCode || e.charCode);
+                var sel = RegFormatter.getCaretPosition(_this.element);
+                var positionStart = sel.selectionStart;
+                var positionEnd = sel.selectionEnd;
+                var val = _this.write(str, _this.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
                 if (val) {
                     _this.element.value = val.value;
-                    _this.element.selectionStart = _this.element.selectionEnd = val.position + 1;
+                    RegFormatter.setCaretPosition(_this.element, val.position + 1);
                 }
-                e.preventDefault();
+                RegFormatter.preventEvent(e);
                 return false;
-            });
+            };
 
-            element.addEventListener("paste", function (e) {
+            var pasteEventHandler = function (e) {
+                e = e || window.event;
                 var text = e.clipboardData.getData("text/plain");
                 if (text) {
                     var value = _this.element.value;
-                    var positionStart = _this.element.selectionStart;
-                    var positionEnd = _this.element.selectionEnd;
+                    var sel = RegFormatter.getCaretPosition(_this.element);
+                    var positionStart = sel.selectionStart;
+                    var positionEnd = sel.selectionEnd;
                     var val = _this.write(text, value, positionStart, positionEnd === positionStart ? null : positionEnd);
                     if (val) {
                         _this.element.value = val.value;
-                        _this.element.selectionStart = _this.element.selectionEnd = positionStart + val.value.length;
+                        RegFormatter.setCaretPosition(_this.element, positionStart + val.value.length);
                     }
                 }
-                e.preventDefault();
+                RegFormatter.preventEvent(e);
                 return false;
-            });
+            };
+
+            RegFormatter.addEvent(element, "keydown", keydownEventHandler);
+            RegFormatter.addEvent(element, "keypress", keypressEventHandler);
+            RegFormatter.addEvent(element, "paste", pasteEventHandler);
 
             var value = this.element.value;
             if (value) {
@@ -214,6 +234,52 @@
             }
         }
     }
+
+    RegFormatter.addEvent = function (elem, type, func) {
+        if (elem.addEventListener)
+            elem.addEventListener(type, func)
+        else
+            elem.attachEvent("on" + type, func);
+    }
+
+    RegFormatter.preventEvent = function (e) {
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+    }
+
+    RegFormatter.getCaretPosition = function (elem) {
+        if (document.selection) {
+            elem.focus();
+            var sel = document.selection.createRange();
+            var selLen = sel.text.length;
+            sel.moveStart('character', -elem.value.length);
+            return {
+                selectionStart: sel.text.length - selLen,
+                selectionEnd: sel.text.length
+            }
+        }
+        return {
+            selectionStart: elem.selectionStart,
+            selectionEnd: elem.selectionEnd
+        }
+    }
+
+    RegFormatter.setCaretPosition = function (elem, pos) {
+        if (elem.setSelectionRange) {
+            elem.focus();
+            elem.setSelectionRange(pos, pos);
+        }
+        else if (elem.createTextRange) {
+            var range = elem.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', pos);
+            range.moveStart('character', pos);
+            range.select();
+        }
+    }
+
     RegFormatter.prototype.checkValue = function (value) {
         var pso = this.patternsOriginal.concat();
         pso.pop();
