@@ -163,7 +163,7 @@
                 var code = e.keyCode || e.charCode;
                 if (code === 8 || code === 46) {
                     if (!_this.element.value)
-                        return false;
+                        return;
                     var sel = RegFormatter.getCaretPosition(_this.element);
                     var positionStart = sel.selectionStart;
                     var positionEnd = sel.selectionEnd;
@@ -181,10 +181,8 @@
                             positionStart = val.value.length;
                         RegFormatter.setCaretPosition(_this.element, positionStart);
                         RegFormatter.preventEvent(e);
-                        return false;
                     }
                 }
-                return true;
             };
 
             var keypressEventHandler = function (e) {
@@ -200,7 +198,6 @@
                     RegFormatter.setCaretPosition(_this.element, val.position + 1);
                 }
                 RegFormatter.preventEvent(e);
-                return false;
             };
 
             var pasteEventHandler = function (e) {
@@ -218,7 +215,6 @@
                     }
                 }
                 RegFormatter.preventEvent(e);
-                return false;
             };
 
             var inputEventHandler = function() {
@@ -345,7 +341,7 @@
     RegFormatter.prototype.write = function (str, value, positionStart, positionEnd) {
         var currentValue = this.value(value);
         if (currentValue === "" && str === "")
-            return { value: value, position: value.length };
+            return { value: "", position: 0 };
         var newvalue;
         var position;
         if (!positionEnd) {
