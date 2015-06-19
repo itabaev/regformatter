@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="app.css" type="text/css" />
-    <script src="regformatter.min.js"></script>
+    <script src="regformatter.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,6 +22,7 @@
             <a href="https://github.com/itabaev/regformatter/tarball/master" target="_blank" class="btn btn-default"><small>Download</small><br>TAR file</a>
             <a href="https://github.com/itabaev/regformatter" target="_blank" class="btn btn-default"><small>View on</small><br>GitHub</a>
         </div>
+
         <h2>Examples</h2>
         <hr />
         <div class="form-group">
@@ -63,13 +64,52 @@
                 });
             </script>
         </div>
-        <br />
+        <br/>
+
+        <h2>Test your pattern</h2>
+        <hr/>
+        <div class="form-group" id="testGroup">
+            <label for="testFormat" class="control-label">Test format</label>
+            <input type="text" id="testFormat" value="%[A-z]{1,3}%-%\d{2}%" class="form-control bg-warning" />
+            <br/>
+            <label for="testField" class="control-label">Test field</label>
+            <input type="text" id="testField" value="" class="form-control" />
+            <script>
+                var testGroup = document.getElementById("testGroup");
+                var testFormat = document.getElementById("testFormat");
+                var testField = document.getElementById("testField");
+                var test = new RegFormatter({
+                    element: testField,
+                    format: testFormat.value
+                });
+                var reset = function() {
+                    try {
+                        var val = test.value();
+                        test.reset(testFormat.value);
+                        var v = test.write(val, "", 0, 0);
+                        if (v) {
+                            testField.value = v.value;
+                            RegFormatter.setCaretPosition(testField, v.position + 1);
+                        }
+                        testGroup.className = "form-group";
+                    } catch (e) {
+                        testGroup.className = "form-group has-error";
+                    }
+                }
+                if (testFormat.addEventListener)
+                    testFormat.addEventListener("change", reset);
+                else
+                    testFormat.attachEvent("onchange", reset);
+            </script>
+        </div>
+        <br/>
 
         <h2>Constructor</h2>
         <hr />
         <p class="lead"><strong>new RegFormatter(obj)</strong></p>
         <p class="text-muted"><strong><mark>obj.element</mark></strong> - INPUT element (optional parameter)</p>
-        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>obj.element</mark></p>
+        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>obj.element</mark> (optional parameter if <mark>obj.formats</mark> is specified)</p>
+        <p class="text-muted"><strong><mark>obj.formats</mark></strong> - array of patterns (optional parameter if <mark>obj.format</mark> is specified)</p>
         <br />
 
         <h2>Instance methods</h2>
@@ -100,7 +140,7 @@
         <div class="well well-sm" id="phoneWrite"></div>
         <script>
             var phoneWrite = document.getElementById("phoneWrite");
-            var write = function () {
+            var write = function() {
                 var obj = phone.write("7", phoneElem.value, 0);
                 if (obj)
                     phoneWrite.innerHTML = "{ value: \"" + obj.value + "\", position: " + obj.position + " }";
@@ -113,6 +153,11 @@
             else
                 phoneElem.attachEvent("onkeyup", write);
         </script>
+        <br/>
+
+        <p class="lead"><strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>obj.element</mark></p>
+        <p><code>phone.reset("%[0-9]{3}% %\\d{3}% %\\d{2}% %\\d{2}%")</code></p>
+
         <br /><br /><br /><br />
     </div>
 </body>
