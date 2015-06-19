@@ -3,3 +3,7 @@
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
 }
+
+.form-control.bg-warning {
+    background-color: #fcf8e3 !important;
+}
