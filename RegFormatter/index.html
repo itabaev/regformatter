@@ -29,12 +29,19 @@
             <label for="phone" class="control-label">Phone number</label>
             <input type="text" id="phone" value="79876543210" class="form-control" />
             <br />
-            <code>var phone = new RegFormatter({ element: document.getElementById('phone'), format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%" });</code>
+            <code>
+                var phone = new RegFormatter({<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;element: document.getElementById('phone'),<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;format: "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;formats: ["%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%", "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"]<br />
+                });
+            </code>
             <script>
                 var phoneElem = document.getElementById("phone");
                 var phone = new RegFormatter({
                     element: phoneElem,
-                    format: "+%\\d{1,2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
+                    format: "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
+                    formats: ["%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%", "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"]
                 });
             </script>
         </div>
@@ -64,14 +71,14 @@
                 });
             </script>
         </div>
-        <br/>
+        <br />
 
         <h2>Test your pattern</h2>
-        <hr/>
+        <hr />
         <div class="form-group" id="testGroup">
             <label for="testFormat" class="control-label">Test format</label>
-            <input type="text" id="testFormat" value="%[A-z]{1,3}%-%\d{2}%" class="form-control bg-warning" />
-            <br/>
+            <input type="text" id="testFormat" value="%\d?[A-z]{1,3}%-%\d{2}%" class="form-control bg-warning" />
+            <br />
             <label for="testField" class="control-label">Test field</label>
             <input type="text" id="testField" value="" class="form-control" />
             <script>
@@ -82,7 +89,7 @@
                     element: testField,
                     format: testFormat.value
                 });
-                var reset = function() {
+                var reset = function () {
                     try {
                         var val = test.value();
                         test.reset(testFormat.value);
@@ -102,7 +109,7 @@
                     testFormat.attachEvent("onchange", reset);
             </script>
         </div>
-        <br/>
+        <br />
 
         <h2>Constructor</h2>
         <hr />
@@ -140,7 +147,7 @@
         <div class="well well-sm" id="phoneWrite"></div>
         <script>
             var phoneWrite = document.getElementById("phoneWrite");
-            var write = function() {
+            var write = function () {
                 var obj = phone.write("7", phoneElem.value, 0);
                 if (obj)
                     phoneWrite.innerHTML = "{ value: \"" + obj.value + "\", position: " + obj.position + " }";
@@ -153,7 +160,7 @@
             else
                 phoneElem.attachEvent("onkeyup", write);
         </script>
-        <br/>
+        <br />
 
         <p class="lead"><strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>obj.element</mark></p>
         <p><code>phone.reset("%[0-9]{3}% %\\d{3}% %\\d{2}% %\\d{2}%")</code></p>
