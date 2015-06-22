@@ -8,6 +8,12 @@
         };
     }
 
+    if (!Array.isArray) {
+        Array.isArray = function (arg) {
+            return Object.prototype.toString.call(arg) === "[object Array]";
+        };
+    }
+
     var addEvent = function (elem, type, func) {
         if (elem.addEventListener)
             elem.addEventListener(type, func);
@@ -82,6 +88,8 @@
 
             var keypressEventHandler = function (e) {
                 e = e || window.event;
+                if (e.ctrlKey || (e.key && e.key.length > 1))
+                    return;
                 var str = String.fromCharCode(e.keyCode || e.charCode);
                 var sel = getCaretPosition(_this.element);
                 var positionStart = sel.selectionStart;
@@ -314,6 +322,7 @@
                 if (expEscapeds.indexOf(charAt) >= 0) {
                     p += "\\" + charAt;
                     addPattern(exp);
+                    continue;
                 }
 
                 p += charAt;

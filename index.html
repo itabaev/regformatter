@@ -32,16 +32,22 @@
             <code>
                 var phone = new RegFormatter({<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;element: document.getElementById('phone'),<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;format: "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;formats: ["%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%", "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;formats: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;]<br />
                 });
             </code>
             <script>
                 var phoneElem = document.getElementById("phone");
                 var phone = new RegFormatter({
                     element: phoneElem,
-                    format: "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
-                    formats: ["%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%", "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"]
+                    formats: [
+                        "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
+                        "%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
+                        "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
+                    ]
                 });
             </script>
         </div>
