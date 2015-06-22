@@ -122,13 +122,13 @@
                 preventEvent(e);
             };
 
-            var cutEventHandler = function() {
+            var cutEventHandler = function () {
                 var sel = getCaretPosition(_this.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 var val = _this.write("", _this.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
                 if (val) {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         _this.element.value = val.value;
                         _this.oldValue = val.value;
                         RegFormatter.setCaretPosition(_this.element, val.position);
@@ -178,7 +178,8 @@
         var expSymbols = [".", "[", "]", "(", ")", "+", "-", "*", "?", "{", "}", "|", "/", "^", "$"];
         var expBegBrackets = ["%", "[", "(", "{"];
         var expEndBrackets = ["%", "]", ")", "}"];
-        var expEscapeds = ["+", "*", "?", "|", "^", "$"];
+        var expEscapeds = ["+", "*", "|", "^", "$"];
+        var expCounters = ["{", "?"];
 
         var patternsArr = [];
         var patterns = [];
@@ -187,9 +188,10 @@
         var backslash = false;
         var brackets = [];
         var testpattern = "";
+        var i;
 
         var addPattern = function (isExp) {
-            if (p === "" || (isExp && (brackets.length > 1 || (i + 1 < format.length && format.charAt(i + 1) === "{"))))
+            if (p === "" || (isExp && (brackets.length > 1 || (i + 1 < format.length && expCounters.indexOf(format.charAt(i + 1)) >= 0))))
                 return;
             patterns.push({ value: p, isExp: isExp });
             testpattern += p;
@@ -197,21 +199,48 @@
         };
 
         var push = function (ps, ind, con) {
-            var i;
-            for (i = ind; i >= 0; i--) {
-                var pat = ps[i];
+            var pp;
+            for (pp = ind; pp >= 0; pp--) {
+                var pat = ps[pp];
                 if (pat.isExp && Array.isArray(pat.value)) {
-                    for (var j = 0; j < pat.value.length; j++) {
-                        var a = pat.value[j].concat(con);
-                        push(ps, i - 1, a);
+                    for (var ppp = 0; ppp < pat.value.length; ppp++) {
+                        var patt;
+                        if (Array.isArray(pat.value[ppp]))
+                            patt = pat.value[ppp];
+                        else patt = [pat.value[ppp]];
+                        for (var l = 0; l < patt.length; l++) {
+                            if (patt[l].value === "") {
+                                patt.splice(l, 1);
+                                l--;
+                            }
+                        }
+                        push(ps, pp - 1, patt.concat(con));
                     }
                     break;
                 } else {
                     con.unshift(pat);
                 }
             }
-            if (i <= 0) {
-                patternsArr.push(con);
+            if (pp <= 0) {
+                var exists = false;
+                for (var m = 0; m < patternsArr.length; m++) {
+                    if (patternsArr[m].length === con.length) {
+                        var eq = true;
+                        for (var o = 0; o < patternsArr[m].length; o++) {
+                            var p1 = patternsArr[m][o];
+                            var p2 = con[o];
+                            if (!(p1.isExp === p2.isExp && p1.value.length === p2.value.length && p1.value === p2.value)) {
+                                eq = false;
+                            }
+                        }
+                        if (eq) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+                if (!exists)
+                    patternsArr.push(con);
             }
         }
 
@@ -223,7 +252,6 @@
             backslash = false;
             brackets = [];
             testpattern = "";
-            var i;
 
             for (i = 0; i < format.length; i++) {
                 var charAt = format.charAt(i);
@@ -321,9 +349,9 @@
             for (i = 0; i < patterns.length; i++) {
                 p = patterns[i];
                 if (p.isExp) {
-                    reg = /\{(\d),(\d)\}$/;
-                    exec = reg.exec(p.value);
-                    if (exec) {
+                    if (/[^\\]\{(\d),(\d)\}$/.test(p.value)) {
+                        reg = /\{(\d),(\d)\}$/;
+                        exec = reg.exec(p.value);
                         var n1 = parseInt(exec[1]);
                         var n2 = parseInt(exec[2]);
                         if (!n1 || !n2 || n1 < 1 || n1 > n2)
@@ -341,7 +369,10 @@
                             branches.push(a.concat());
                         }
                         patterns.splice(i, 1, { value: branches, isExp: p.isExp });
-                    } else if (/(^|[^\\])\{(\d),(\d)\}/.test(p.value))
+                    } else if (/[^\\]\?$/.test(p.value)) {
+                        p.value = p.value.replace(/\?$/, "");
+                        patterns.splice(i, 1, { value: [{ value: "", isExp: p.isExp }, p], isExp: p.isExp });
+                    } else if (/(^|[^\\])(\{(\d),(\d)\})|\?/.test(p.value))
                         throw "Invalid pattern '" + format + "' in '" + p.value + "'";
                 }
             }
