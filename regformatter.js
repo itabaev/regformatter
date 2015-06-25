@@ -358,8 +358,8 @@
             for (i = 0; i < patterns.length; i++) {
                 p = patterns[i];
                 if (p.isExp) {
-                    if (/[^\\]\{(\d),(\d)\}$/.test(p.value)) {
-                        reg = /\{(\d),(\d)\}$/;
+                    if (/[^\\]\{(\d+),(\d+)\}$/.test(p.value)) {
+                        reg = /\{(\d+),(\d+)\}$/;
                         exec = reg.exec(p.value);
                         var n1 = parseInt(exec[1]);
                         var n2 = parseInt(exec[2]);
@@ -381,7 +381,7 @@
                     } else if (/[^\\]\?$/.test(p.value)) {
                         p.value = p.value.replace(/\?$/, "");
                         patterns.splice(i, 1, { value: [{ value: "", isExp: p.isExp }, p], isExp: p.isExp });
-                    } else if (/(^|[^\\])(\{(\d),(\d)\})|\?/.test(p.value))
+                    } else if (/(^|[^\\])(\{(\d+),(\d+)\})|\?/.test(p.value))
                         throw "Invalid pattern '" + format + "' in '" + p.value + "'";
                 }
             }
