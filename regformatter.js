@@ -460,10 +460,10 @@
 
         for (var k = 0; k < this.patterns.length; k++) {
             var ps = this.patterns[k];
-            if (ps.length === 1 && ps[0].isExp && ps[0].value === ".*")
-                return { value: newvalue, position: position };
             var val = newvalue;
             var pos = position;
+            if (ps.length === 1 && ps[0].isExp && ps[0].value === ".*")
+                return { value: val, position: pos + str.length };
             var j = 1;
             for (var i = 0; i < ps.length; i++) {
                 var p = ps.slice(0, i + 1);
