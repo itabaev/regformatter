@@ -98,7 +98,7 @@
                 if (val) {
                     _this.element.value = val.value;
                     _this.oldValue = val.value;
-                    RegFormatter.setCaretPosition(_this.element, val.position + 1);
+                    RegFormatter.setCaretPosition(_this.element, val.position);
                 }
                 preventEvent(e);
             };
@@ -124,7 +124,7 @@
                     if (val) {
                         _this.element.value = val.value;
                         _this.oldValue = val.value;
-                        RegFormatter.setCaretPosition(_this.element, val.position + 1);
+                        RegFormatter.setCaretPosition(_this.element, val.position);
                     }
                 }
                 preventEvent(e);
@@ -139,7 +139,7 @@
                     setTimeout(function () {
                         _this.element.value = val.value;
                         _this.oldValue = val.value;
-                        RegFormatter.setCaretPosition(_this.element, val.position);
+                        RegFormatter.setCaretPosition(_this.element, val.position - 1);
                     }, 10);
                 }
             }
@@ -254,6 +254,10 @@
 
         for (var k = 0; k < formats.length; k++) {
             format = formats[k];
+            if (format === "*") {
+                patternsArr.push([{ value: ".*", isExp: true }]);
+                continue;
+            }
             patterns = [];
             p = "";
             exp = false;
@@ -413,6 +417,8 @@
         var i;
         var ps = null;
         for (i = 0; i < _this.patterns.length; i++) {
+            if (_this.patterns[i].length === 1 && _this.patterns[i][0].isExp && _this.patterns[i][0].value === ".*")
+                return value;
             ps = _this.patterns[i].slice(0, value.length);
             if (new RegExp("^" + joinArray(ps) + "$").test(value))
                 break;
@@ -454,6 +460,8 @@
 
         for (var k = 0; k < this.patterns.length; k++) {
             var ps = this.patterns[k];
+            if (ps.length === 1 && ps[0].isExp && ps[0].value === ".*")
+                return { value: newvalue, position: position };
             var val = newvalue;
             var pos = position;
             var j = 1;
@@ -481,7 +489,7 @@
                 }
                 if (j > val.length) {
                     if (reg)
-                        return { value: val, position: pos + (str.length > 0 ? str.length - 1 : 0) };
+                        return { value: val, position: pos + str.length };
                     else
                         break;
                 }
