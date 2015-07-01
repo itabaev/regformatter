@@ -57,6 +57,10 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="jquery.regformatter.js" />
+    <Content Include="jquery.regformatter.min.js">
+      <DependentUpon>jquery.regformatter.js</DependentUpon>
+    </Content>
     <Content Include="regformatter.min.js.map">
       <DependentUpon>regformatter.min.js</DependentUpon>
     </Content>
@@ -72,6 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="jquery.regformatter.min.js.map">
+      <DependentUpon>jquery.regformatter.min.js</DependentUpon>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

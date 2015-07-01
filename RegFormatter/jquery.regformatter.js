@@ -549,4 +549,15 @@
     };
     return RegFormatter;
 })();
-//# sourceMappingURL=regformatter.js.map
+
+(function($) {
+    $.fn.regformatter = function(obj) {
+        return this.each(function () {
+            var regformatter = $(this).data("regformatter") || false;
+            if (regformatter && regformatter.destroy && typeof regformatter.destroy === "function")
+                regformatter.destroy();
+            regformatter = new RegFormatter(this, obj);
+            $(this).data("regformatter", regformatter);
+        });
+    }
+})(jQuery);

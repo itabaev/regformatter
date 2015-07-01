@@ -6,8 +6,9 @@
     <title>RegFormatter</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="app.css" type="text/css" />
-    <script src="regformatter.js"></script>
+    <link rel="stylesheet" href="app.css" type="text/css"/>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="jquery.regformatter.js"></script>
 </head>
 <body>
     <div class="container">
@@ -30,8 +31,7 @@
             <input type="text" id="phone" value="79876543210" class="form-control" />
             <br />
             <code>
-                var phone = new RegFormatter({<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;element: document.getElementById('phone'),<br />
+                var phone = new RegFormatter(document.getElementById('phone'), {<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;formats: [<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",<br />
@@ -41,8 +41,7 @@
             </code>
             <script>
                 var phoneElem = document.getElementById("phone");
-                var phone = new RegFormatter({
-                    element: phoneElem,
+                var phone = new RegFormatter(phoneElem, {
                     formats: [
                         "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
                         "%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
@@ -56,12 +55,13 @@
             <label for="cardnumber" class="control-label">Credit card number</label>
             <input type="text" id="cardnumber" value="1234567890123456" class="form-control" />
             <br />
-            <code>var cardNumber = new RegFormatter({ element: document.getElementById('cardnumber'), format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%" });</code>
+            <code>var cardNumber = new RegFormatter(document.getElementById('cardnumber'), { format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%" });</code>
             <script>
-                var cardNumber = new RegFormatter({
-                    element: document.getElementById("cardnumber"),
-                    format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
-                });
+                $(function () {
+                    $('#cardnumber').regformatter({
+                        format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
+                    });
+                })
             </script>
         </div>
         <br />
@@ -69,10 +69,9 @@
             <label for="carddate" class="control-label">Credit card expire date</label>
             <input type="text" id="carddate" value="1234" class="form-control" />
             <br />
-            <code>var cardDate = new RegFormatter({ element: document.getElementById('carddate'), format: "%[01]\\d%\/%\\d{2}%" });</code>
+            <code>var cardDate = new RegFormatter(document.getElementById('carddate'), { format: "%[01]\\d%\/%\\d{2}%" });</code>
             <script>
-                var cardDate = new RegFormatter({
-                    element: document.getElementById("carddate"),
+                var cardDate = new RegFormatter(document.getElementById("carddate"), {
                     format: "%[01]\\d%\/%\\d{2}%"
                 });
             </script>
@@ -91,8 +90,7 @@
                 var testGroup = document.getElementById("testGroup");
                 var testFormat = document.getElementById("testFormat");
                 var testField = document.getElementById("testField");
-                var test = new RegFormatter({
-                    element: testField,
+                var test = new RegFormatter(testField, {
                     format: testFormat.value
                 });
                 var reset = function () {
@@ -119,9 +117,12 @@
 
         <h2>Constructor</h2>
         <hr />
-        <p class="lead"><strong>new RegFormatter(obj)</strong></p>
-        <p class="text-muted"><strong><mark>obj.element</mark></strong> - INPUT element (optional parameter)</p>
-        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>obj.element</mark> (optional parameter if <mark>obj.formats</mark> is specified)</p>
+        <h3>Vanilla JavaScript</h3>
+        <p class="lead"><strong>new RegFormatter(element, obj)</strong></p>
+        <h3>jQuery</h3>
+        <p class="lead"><strong>$("selector").regformatter(obj)</strong></p>
+        <p class="text-muted"><strong><mark>element</mark></strong> - INPUT element (optional parameter)</p>
+        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>element</mark> (optional parameter if <mark>obj.formats</mark> is specified)</p>
         <p class="text-muted"><strong><mark>obj.formats</mark></strong> - array of patterns (optional parameter if <mark>obj.format</mark> is specified)</p>
         <br />
 
@@ -168,7 +169,7 @@
         </script>
         <br />
 
-        <p class="lead"><strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>obj.element</mark></p>
+        <p class="lead"><strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>element</mark></p>
         <p><code>phone.reset("%[0-9]{3}% %\\d{3}% %\\d{2}% %\\d{2}%")</code></p>
 
         <br /><br /><br /><br />
