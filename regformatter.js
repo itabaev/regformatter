@@ -55,9 +55,7 @@
                 if (val) {
                     self.element.value = val.value;
                     self.oldValue = val.value;
-                    if (positionStart > val.value.length)
-                        positionStart = val.value.length;
-                    RegFormatter.setCaretPosition(self.element, positionStart);
+                    RegFormatter.setCaretPosition(self.element, val.position);
                     RegFormatter.preventEvent(e);
                 }
             }
@@ -495,17 +493,19 @@
             return { value: "", position: 0 };
         var newvalue;
         var position;
+        var subvalue1;
+        var subvalue2;
         if (!positionEnd) {
-            var subvalue1 = this.value(value.substring(0, positionStart));
-            var subvalue2 = currentValue.substring(subvalue1.length);
+            subvalue1 = this.value(value.substring(0, positionStart));
+            subvalue2 = currentValue.substring(subvalue1.length);
             newvalue = subvalue1 + str + subvalue2;
             position = subvalue1.length;
         } else {
-            var value1 = this.value(value.substring(0, positionStart));
-            var value2 = this.value(value.substring(0, positionEnd));
-            var value3 = currentValue.substring(value2.length);
-            newvalue = value1 + str + value3;
-            position = value1.length;
+            subvalue1 = this.value(value.substring(0, positionStart));
+            subvalue2 = this.value(value.substring(0, positionEnd));
+            var value3 = currentValue.substring(subvalue2.length);
+            newvalue = subvalue1 + str + value3;
+            position = subvalue1.length;
         }
 
         for (var k = 0; k < this.patterns.length; k++) {
@@ -525,8 +525,8 @@
                         if (!ps[i].isExp) {
                             var s = ps[i].value.replace(/^\\/, "");
                             val = val.substring(0, j - 1) + s + val.substring(j - 1);
-                            if (j < pos + str.length + 1)
-                                pos++;
+                            if (j < pos + str.length + s.length)
+                                pos += s.length;
                             continue;
                         } else {
                             j++;
@@ -549,4 +549,3 @@
     };
     return RegFormatter;
 })();
-//# sourceMappingURL=regformatter.js.map
