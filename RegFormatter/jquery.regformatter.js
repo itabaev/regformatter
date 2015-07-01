@@ -551,13 +551,51 @@
 })();
 
 (function($) {
-    $.fn.regformatter = function(obj) {
-        return this.each(function () {
-            var regformatter = $(this).data("regformatter") || false;
-            if (regformatter && regformatter.destroy && typeof regformatter.destroy === "function")
-                regformatter.destroy();
-            regformatter = new RegFormatter(this, obj);
-            $(this).data("regformatter", regformatter);
-        });
+    $.fn.regformatter = function (obj) {
+        if (obj) {
+            this.each(function() {
+                var regformatter = $(this).data("regformatter") || false;
+                if (regformatter && regformatter.destroy && typeof regformatter.destroy === "function")
+                    regformatter.destroy();
+                regformatter = new RegFormatter(this, obj);
+                $(this).data("regformatter", regformatter);
+            });
+        }
+
+        this.value = function (value) {
+            if (this.length > 1) {
+                var ret = [];
+                this.each(function() {
+                    var regformatter = $(this).data("regformatter") || false;
+                    if (regformatter && regformatter.value && typeof regformatter.value === "function")
+                        ret.push(regformatter.value(value));
+                });
+                return ret;
+            } else if (this.length === 1) {
+                var regformatter = $(this).data("regformatter") || false;
+                if (regformatter && regformatter.value && typeof regformatter.value === "function")
+                    return regformatter.value(value);
+            }
+            return null;
+        }
+
+        this.write = function (str, value, positionStart, positionEnd) {
+            if (this.length > 1) {
+                var ret = [];
+                this.each(function () {
+                    var regformatter = $(this).data("regformatter") || false;
+                    if (regformatter && regformatter.write && typeof regformatter.write === "function")
+                        ret.push(regformatter.write(str, value, positionStart, positionEnd));
+                });
+                return ret;
+            } else if (this.length === 1) {
+                var regformatter = $(this).data("regformatter") || false;
+                if (regformatter && regformatter.write && typeof regformatter.write === "function")
+                    return regformatter.write(str, value, positionStart, positionEnd);
+            }
+            return null;
+        }
+
+        return this;
     }
 })(jQuery);

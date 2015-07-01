@@ -61,6 +61,7 @@
                     $('#cardnumber').regformatter({
                         format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
                     });
+                    console.log($('#cardnumber').regformatter().value());
                 })
             </script>
         </div>
@@ -71,9 +72,12 @@
             <br />
             <code>var cardDate = new RegFormatter(document.getElementById('carddate'), { format: "%[01]\\d%\/%\\d{2}%" });</code>
             <script>
-                var cardDate = new RegFormatter(document.getElementById("carddate"), {
-                    format: "%[01]\\d%\/%\\d{2}%"
-                });
+                $(function () {
+                    $('#carddate').regformatter({
+                        format: "%[01]\\d%\/%\\d{2}%"
+                    });
+                    console.log($('#carddate').regformatter().value());
+                })
             </script>
         </div>
         <br />
