@@ -138,10 +138,8 @@
             e = e || window.event;
             sel = RegFormatter.getCaretPosition(self.element);
             var clipboardData = e.clipboardData || window.clipboardData;
-            if (!clipboardData || !clipboardData.getData) {
-                RegFormatter.preventEvent(e);
+            if (!clipboardData || !clipboardData.getData)
                 return;
-            }
             var text = clipboardData.getData("text/plain");
             if (text) {
                 var positionStart = sel.selectionStart;
