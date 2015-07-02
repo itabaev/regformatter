@@ -34,15 +34,17 @@
             formats.unshift(obj.format);
         this.reset(formats);
 
+        var sel;
+
         var keydownEventHandler = function (e) {
             if (!self.element)
                 return;
+            sel = RegFormatter.getCaretPosition(self.element);
             e = e || window.event;
             var code = e.keyCode || e.charCode;
             if (code === 8 || code === 46) {
                 if (!self.element.value)
                     return;
-                var sel = RegFormatter.getCaretPosition(self.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 if (positionStart === positionEnd) {
@@ -53,10 +55,10 @@
                 }
                 var val = self.write("", self.element.value, positionStart, positionEnd);
                 if (val) {
+                    RegFormatter.preventEvent(e);
                     self.element.value = val.value;
                     self.oldValue = val.value;
                     RegFormatter.setCaretPosition(self.element, val.position);
-                    RegFormatter.preventEvent(e);
                 }
             }
         };
@@ -67,10 +69,16 @@
             e = e || window.event;
             if (e.ctrlKey || (e.key && e.key.length > 1) || (e.keyCode || e.charCode) === 13)
                 return;
-            var str = String.fromCharCode(e.keyCode || e.charCode);
+            var str;
+            if (e.which == null)
+                str = String.fromCharCode(e.keyCode);
+            else if (e.which !== 0 && e.charCode !== 0)
+                str = String.fromCharCode(e.which);
+            else
+                return;
             if (!str)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
+            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -82,25 +90,58 @@
             RegFormatter.preventEvent(e);
         };
 
-        var inputEventHandler = function () {
+        var beforeInputHandler = function(e) {
             if (!self.element)
                 return;
-            var val = self.write(self.element.value, "", 0);
+            e = e || window.event;
+            sel = RegFormatter.getCaretPosition(self.element);
+            RegFormatter.preventEvent(e);
+            var str = e.data;
+            console.log(str);
+            if (!str)
+                return;
+            var positionStart = sel.selectionStart;
+            var positionEnd = sel.selectionEnd;
+            var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
             if (val) {
                 self.element.value = val.value;
                 self.oldValue = val.value;
-                RegFormatter.setCaretPosition(self.element, val.value.length);
+                RegFormatter.setCaretPosition(self.element, val.position);
+            }
+        }
+
+        var inputEventHandler = function () {
+            if (!self.element)
+                return;
+            if (!sel)
+                sel = RegFormatter.getCaretPosition(self.element);
+            var positionStart = sel.selectionStart;
+            var positionEnd = sel.selectionEnd;
+            sel = null;
+            var value = self.oldValue || "";
+            var subvalue1 = value.substring(0, positionStart);
+            var subvalue2 = value.substring(positionEnd);
+            var str = self.element.value.substring(subvalue1.length);
+            str = str.substring(0, str.length - subvalue2.length);
+            var val = self.write(str, value, positionStart, positionEnd === positionStart ? null : positionEnd);
+            if (val) {
+                self.element.value = val.value;
+                self.oldValue = val.value;
+                RegFormatter.setCaretPosition(self.element, val.position);
             } else
-                self.element.value = self.oldValue;
+                self.element.value = value;
         }
 
         var pasteEventHandler = function (e) {
             if (!self.element)
                 return;
             e = e || window.event;
-            var text = e.clipboardData.getData("text/plain");
+            sel = RegFormatter.getCaretPosition(self.element);
+            var clipboardData = e.clipboardData || window.clipboardData;
+            if (!clipboardData || !clipboardData.getData)
+                return;
+            var text = clipboardData.getData("text/plain");
             if (text) {
-                var sel = RegFormatter.getCaretPosition(self.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 var val = self.write(text, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -116,7 +157,7 @@
         var cutEventHandler = function () {
             if (!self.element)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
+            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write("", self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -124,7 +165,7 @@
                 setTimeout(function () {
                     self.element.value = val.value;
                     self.oldValue = val.value;
-                    RegFormatter.setCaretPosition(self.element, val.position - 1);
+                    RegFormatter.setCaretPosition(self.element, val.position);
                 }, 10);
             }
         }
@@ -132,6 +173,7 @@
         if (element) {
             RegFormatter.addEvent(element, "keydown", keydownEventHandler);
             RegFormatter.addEvent(element, "keypress", keypressEventHandler);
+            RegFormatter.addEvent(element, "beforeinput", beforeInputHandler);
             RegFormatter.addEvent(element, "input", inputEventHandler);
             RegFormatter.addEvent(element, "paste", pasteEventHandler);
             RegFormatter.addEvent(element, "cut", cutEventHandler);
@@ -142,6 +184,7 @@
             if (self.element) {
                 RegFormatter.removeEvent(self.element, "keydown", keydownEventHandler);
                 RegFormatter.removeEvent(self.element, "keypress", keypressEventHandler);
+                RegFormatter.removeEvent(self.element, "beforeinput", beforeInputHandler);
                 RegFormatter.removeEvent(self.element, "input", inputEventHandler);
                 RegFormatter.removeEvent(self.element, "paste", pasteEventHandler);
                 RegFormatter.removeEvent(self.element, "cut", cutEventHandler);
@@ -488,8 +531,8 @@
     };
 
     RegFormatter.prototype.write = function (str, value, positionStart, positionEnd) {
-        var currentValue = this.value(value);
-        if (currentValue === "" && str === "")
+        var currentValue = this.value(value || "");
+        if (typeof currentValue === "undefined" || currentValue === null || (!currentValue && !str))
             return { value: "", position: 0 };
         var newvalue;
         var position;
@@ -507,6 +550,9 @@
             newvalue = subvalue1 + str + value3;
             position = subvalue1.length;
         }
+
+        if (!newvalue)
+            return { value: newvalue || "", position: position };
 
         for (var k = 0; k < this.patterns.length; k++) {
             var ps = this.patterns[k];
