@@ -114,7 +114,8 @@
             var value = self.oldValue;
             var subvalue1 = value.substring(0, positionStart);
             var subvalue2 = value.substring(positionEnd);
-            var str = self.element.value.replace(new RegExp(subvalue2 + "$"), "").replace(new RegExp("^" + subvalue1), "");
+            var str = self.element.value.substring(subvalue1.length);
+            str = str.substring(0, str.length - subvalue2.length);
             var val = self.write(str, value, positionStart, positionEnd === positionStart ? null : positionEnd);
             if (val) {
                 self.element.value = val.value;
