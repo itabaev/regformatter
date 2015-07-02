@@ -510,7 +510,7 @@
 
     RegFormatter.prototype.write = function (str, value, positionStart, positionEnd) {
         var currentValue = this.value(value);
-        if (currentValue === "" && str === "")
+        if (typeof currentValue === "undefined" || (currentValue === "" && str === ""))
             return { value: "", position: 0 };
         var newvalue;
         var position;
