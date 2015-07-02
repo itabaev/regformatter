@@ -117,7 +117,7 @@
             var positionStart = selection.selectionStart;
             var positionEnd = selection.selectionEnd;
             selection = null;
-            var value = self.oldValue;
+            var value = self.oldValue || "";
             var subvalue1 = value.substring(0, positionStart);
             var subvalue2 = value.substring(positionEnd);
             var str = self.element.value.substring(subvalue1.length);
