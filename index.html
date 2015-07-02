@@ -6,7 +6,7 @@
     <title>RegFormatter</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="app.css" type="text/css"/>
+    <link rel="stylesheet" href="app.css" type="text/css" />
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="jquery.regformatter.js"></script>
 </head>
@@ -68,7 +68,8 @@
         <br />
         <div class="form-group">
             <label for="carddate" class="control-label">Credit card expire date</label>
-            <input type="text" id="carddate" value="1234" class="form-control" />
+            <input type="text" id="carddate" value="" class="form-control" />
+            <input type="text" value="" class="form-control" />
             <br />
             <code>var cardDate = new RegFormatter(document.getElementById('carddate'), { format: "%[01]\\d%\/%\\d{2}%" });</code>
             <script>
@@ -122,19 +123,35 @@
         <h2>Constructor</h2>
         <hr />
         <h3>Vanilla JavaScript</h3>
-        <p class="lead"><strong>new RegFormatter(element, obj)</strong></p>
+        <p class="lead">
+            <strong>new RegFormatter(element, obj)</strong>
+        </p>
         <h3>jQuery</h3>
-        <p class="lead"><strong>$("selector").regformatter(obj)</strong></p>
-        <p class="text-muted"><strong><mark>element</mark></strong> - INPUT element (optional parameter)</p>
-        <p class="text-muted"><strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>element</mark> (optional parameter if <mark>obj.formats</mark> is specified)</p>
-        <p class="text-muted"><strong><mark>obj.formats</mark></strong> - array of patterns (optional parameter if <mark>obj.format</mark> is specified)</p>
+        <p class="lead">
+            <strong>$("selector").regformatter(obj)</strong>
+        </p>
+        <p class="text-muted">
+            <strong><mark>element</mark></strong> - INPUT element (optional parameter)
+        </p>
+        <p class="text-muted">
+            <strong><mark>obj.format</mark></strong> - pattern that will be used to format <mark>element</mark> (optional parameter if <mark>obj.formats</mark> is specified)
+        </p>
+        <p class="text-muted">
+            <strong><mark>obj.formats</mark></strong> - array of patterns (optional parameter if <mark>obj.format</mark> is specified)
+        </p>
         <br />
 
         <h2>Instance methods</h2>
         <hr />
-        <p class="lead"><strong>value(val)</strong> returns the input value without formatting</p>
-        <p class="text-muted"><strong><mark>val</mark></strong> - formatted value (optional parameter, <mark>element.value</mark> by default)</p>
-        <p><code>phone.value();</code></p>
+        <p class="lead">
+            <strong>value(val)</strong> returns the input value without formatting
+        </p>
+        <p class="text-muted">
+            <strong><mark>val</mark></strong> - formatted value (optional parameter, <mark>element.value</mark> by default)
+        </p>
+        <p>
+            <code>phone.value();</code>
+        </p>
         <div class="well well-sm" id="phoneValue"></div>
         <script>
             var phoneValue = document.getElementById("phoneValue");
@@ -150,11 +167,15 @@
         </script>
         <br />
 
-        <p class="lead"><strong>write(str, value, positionStart, positionEnd)</strong> returns an object that contains the new value, which is obtained by writing <mark>str</mark> to <mark>value</mark> between position <mark>positionStart</mark> and <mark>positionEnd</mark>, and new position index</p>
+        <p class="lead">
+            <strong>write(str, value, positionStart, positionEnd)</strong> returns an object that contains the new value, which is obtained by writing <mark>str</mark> to <mark>value</mark> between position <mark>positionStart</mark> and <mark>positionEnd</mark>, and new position index
+        </p>
         <p class="text-muted">
             <strong><mark>positionEnd</mark></strong> - optional parameter
         </p>
-        <p><code>phone.write("7", document.getElementById('phone').value, 0)</code></p>
+        <p>
+            <code>phone.write("7", document.getElementById('phone').value, 0)</code>
+        </p>
         <div class="well well-sm" id="phoneWrite"></div>
         <script>
             var phoneWrite = document.getElementById("phoneWrite");
@@ -173,10 +194,26 @@
         </script>
         <br />
 
-        <p class="lead"><strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>element</mark></p>
-        <p><code>phone.reset("%[0-9]{3}% %\\d{3}% %\\d{2}% %\\d{2}%")</code></p>
+        <p class="lead">
+            <strong>reset(format)</strong> set the new pattern (or array of patterns) that will be used to format <mark>element</mark>
+        </p>
+        <p>
+            <code>phone.reset("%[0-9]{3}% %\\d{3}% %\\d{2}% %\\d{2}%")</code>
+        </p>
 
         <br /><br /><br /><br />
     </div>
+
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-64125020-1', 'auto');
+        ga('send', 'pageview');
+    </script>
 </body>
 </html>
