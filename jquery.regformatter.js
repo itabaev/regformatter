@@ -42,7 +42,7 @@
             sel = RegFormatter.getCaretPosition(self.element);
             e = e || window.event;
             var code = e.keyCode || e.charCode;
-            if (code === 8 || code === 46) {
+            if (code === 8 || code === 46 || (code === 229 && e.keyIdentifier && e.keyIdentifier === "U+0008")) {
                 if (!self.element.value)
                     return;
                 var positionStart = sel.selectionStart;
