@@ -82,17 +82,37 @@
             RegFormatter.preventEvent(e);
         };
 
-        var inputEventHandler = function () {
+        var beforeInputHandler = function(e) {
             if (!self.element)
                 return;
-            var val = self.write(self.element.value, "", 0);
+            e = e || window.event;
+            RegFormatter.preventEvent(e);
+            var str = e.data;
+            console.log(str);
+            if (!str)
+                return;
+            var sel = RegFormatter.getCaretPosition(self.element);
+            var positionStart = sel.selectionStart;
+            var positionEnd = sel.selectionEnd;
+            var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
             if (val) {
                 self.element.value = val.value;
                 self.oldValue = val.value;
-                RegFormatter.setCaretPosition(self.element, val.value.length);
-            } else
-                self.element.value = self.oldValue;
+                RegFormatter.setCaretPosition(self.element, val.position);
+            }
         }
+
+        //var inputEventHandler = function () {
+        //    if (!self.element)
+        //        return;
+        //    var val = self.write(self.element.value, "", 0);
+        //    if (val) {
+        //        self.element.value = val.value;
+        //        self.oldValue = val.value;
+        //        RegFormatter.setCaretPosition(self.element, val.value.length);
+        //    } else
+        //        self.element.value = self.oldValue;
+        //}
 
         var pasteEventHandler = function (e) {
             if (!self.element)
@@ -124,7 +144,7 @@
                 setTimeout(function () {
                     self.element.value = val.value;
                     self.oldValue = val.value;
-                    RegFormatter.setCaretPosition(self.element, val.position - 1);
+                    RegFormatter.setCaretPosition(self.element, val.position);
                 }, 10);
             }
         }
@@ -132,7 +152,8 @@
         if (element) {
             RegFormatter.addEvent(element, "keydown", keydownEventHandler);
             RegFormatter.addEvent(element, "keypress", keypressEventHandler);
-            RegFormatter.addEvent(element, "input", inputEventHandler);
+            RegFormatter.addEvent(element, "beforeInput", beforeInputHandler);
+            //RegFormatter.addEvent(element, "input", inputEventHandler);
             RegFormatter.addEvent(element, "paste", pasteEventHandler);
             RegFormatter.addEvent(element, "cut", cutEventHandler);
         }
@@ -142,7 +163,7 @@
             if (self.element) {
                 RegFormatter.removeEvent(self.element, "keydown", keydownEventHandler);
                 RegFormatter.removeEvent(self.element, "keypress", keypressEventHandler);
-                RegFormatter.removeEvent(self.element, "input", inputEventHandler);
+                //RegFormatter.removeEvent(self.element, "input", inputEventHandler);
                 RegFormatter.removeEvent(self.element, "paste", pasteEventHandler);
                 RegFormatter.removeEvent(self.element, "cut", cutEventHandler);
             }
