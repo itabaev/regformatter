@@ -34,13 +34,12 @@
             formats.unshift(obj.format);
         this.reset(formats);
 
-        var selection;
+        var sel;
 
         var keydownEventHandler = function (e) {
             if (!self.element)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
-            selection = sel;
+            sel = RegFormatter.getCaretPosition(self.element);
             e = e || window.event;
             var code = e.keyCode || e.charCode;
             if (code === 8 || code === 46) {
@@ -56,10 +55,10 @@
                 }
                 var val = self.write("", self.element.value, positionStart, positionEnd);
                 if (val) {
+                    RegFormatter.preventEvent(e);
                     self.element.value = val.value;
                     self.oldValue = val.value;
                     RegFormatter.setCaretPosition(self.element, val.position);
-                    RegFormatter.preventEvent(e);
                 }
             }
         };
@@ -70,7 +69,7 @@
             e = e || window.event;
             if (e.ctrlKey || (e.key && e.key.length > 1) || (e.keyCode || e.charCode) === 13)
                 return;
-            var str = "";
+            var str;
             if (e.which == null)
                 str = String.fromCharCode(e.keyCode);
             else if (e.which !== 0 && e.charCode !== 0)
@@ -79,7 +78,7 @@
                 return;
             if (!str)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
+            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -100,7 +99,7 @@
             console.log(str);
             if (!str)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
+            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -114,9 +113,11 @@
         var inputEventHandler = function () {
             if (!self.element)
                 return;
-            var positionStart = selection.selectionStart;
-            var positionEnd = selection.selectionEnd;
-            selection = null;
+            if (!sel)
+                sel = RegFormatter.getCaretPosition(self.element);
+            var positionStart = sel.selectionStart;
+            var positionEnd = sel.selectionEnd;
+            sel = null;
             var value = self.oldValue || "";
             var subvalue1 = value.substring(0, positionStart);
             var subvalue2 = value.substring(positionEnd);
@@ -135,9 +136,9 @@
             if (!self.element)
                 return;
             e = e || window.event;
-            var text = e.clipboardData.getData("text/plain");
+            var text = (e.clipboardData || window.clipboardData).getData("text/plain");
             if (text) {
-                var sel = RegFormatter.getCaretPosition(self.element);
+                sel = RegFormatter.getCaretPosition(self.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 var val = self.write(text, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -153,7 +154,7 @@
         var cutEventHandler = function () {
             if (!self.element)
                 return;
-            var sel = RegFormatter.getCaretPosition(self.element);
+            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write("", self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
