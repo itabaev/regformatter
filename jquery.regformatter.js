@@ -94,12 +94,12 @@
             if (!self.element)
                 return;
             e = e || window.event;
+            sel = RegFormatter.getCaretPosition(self.element);
             RegFormatter.preventEvent(e);
             var str = e.data;
             console.log(str);
             if (!str)
                 return;
-            sel = RegFormatter.getCaretPosition(self.element);
             var positionStart = sel.selectionStart;
             var positionEnd = sel.selectionEnd;
             var val = self.write(str, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
@@ -136,9 +136,14 @@
             if (!self.element)
                 return;
             e = e || window.event;
-            var text = (e.clipboardData || window.clipboardData).getData("text/plain");
+            sel = RegFormatter.getCaretPosition(self.element);
+            var clipboardData = e.clipboardData || window.clipboardData;
+            if (!clipboardData || !clipboardData.getData) {
+                RegFormatter.preventEvent(e);
+                return;
+            }
+            var text = clipboardData.getData("text/plain");
             if (text) {
-                sel = RegFormatter.getCaretPosition(self.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 var val = self.write(text, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
