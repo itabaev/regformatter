@@ -70,7 +70,13 @@
             e = e || window.event;
             if (e.ctrlKey || (e.key && e.key.length > 1) || (e.keyCode || e.charCode) === 13)
                 return;
-            var str = String.fromCharCode(e.keyCode || e.charCode);
+            var str = "";
+            if (e.which == null)
+                str = String.fromCharCode(e.keyCode);
+            else if (e.which !== 0 && e.charCode !== 0)
+                str = String.fromCharCode(e.which);
+            else
+                return;
             if (!str)
                 return;
             var sel = RegFormatter.getCaretPosition(self.element);
@@ -521,8 +527,8 @@
     };
 
     RegFormatter.prototype.write = function (str, value, positionStart, positionEnd) {
-        var currentValue = this.value(value);
-        if (typeof currentValue === "undefined" || currentValue === null || (currentValue === "" && str === ""))
+        var currentValue = this.value(value || "");
+        if (typeof currentValue === "undefined" || currentValue === null || (!currentValue && !str))
             return { value: "", position: 0 };
         var newvalue;
         var position;
@@ -540,6 +546,9 @@
             newvalue = subvalue1 + str + value3;
             position = subvalue1.length;
         }
+
+        if (!newvalue)
+            return { value: newvalue || "", position: position };
 
         for (var k = 0; k < this.patterns.length; k++) {
             var ps = this.patterns[k];
