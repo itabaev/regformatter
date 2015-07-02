@@ -34,15 +34,18 @@
             formats.unshift(obj.format);
         this.reset(formats);
 
+        var selection;
+
         var keydownEventHandler = function (e) {
             if (!self.element)
                 return;
+            var sel = RegFormatter.getCaretPosition(self.element);
+            selection = sel;
             e = e || window.event;
             var code = e.keyCode || e.charCode;
             if (code === 8 || code === 46) {
                 if (!self.element.value)
                     return;
-                var sel = RegFormatter.getCaretPosition(self.element);
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
                 if (positionStart === positionEnd) {
@@ -102,17 +105,24 @@
             }
         }
 
-        //var inputEventHandler = function () {
-        //    if (!self.element)
-        //        return;
-        //    var val = self.write(self.element.value, "", 0);
-        //    if (val) {
-        //        self.element.value = val.value;
-        //        self.oldValue = val.value;
-        //        RegFormatter.setCaretPosition(self.element, val.value.length);
-        //    } else
-        //        self.element.value = self.oldValue;
-        //}
+        var inputEventHandler = function () {
+            if (!self.element)
+                return;
+            var positionStart = selection.selectionStart;
+            var positionEnd = selection.selectionEnd;
+            selection = null;
+            var value = self.oldValue;
+            var subvalue1 = value.substring(0, positionStart);
+            var subvalue2 = value.substring(positionEnd);
+            var str = self.element.value.replace(new RegExp(subvalue2 + "$"), "").replace(new RegExp("^" + subvalue1), "");
+            var val = self.write(str, value, positionStart, positionEnd === positionStart ? null : positionEnd);
+            if (val) {
+                self.element.value = val.value;
+                self.oldValue = val.value;
+                RegFormatter.setCaretPosition(self.element, val.position);
+            } else
+                self.element.value = value;
+        }
 
         var pasteEventHandler = function (e) {
             if (!self.element)
@@ -152,8 +162,8 @@
         if (element) {
             RegFormatter.addEvent(element, "keydown", keydownEventHandler);
             RegFormatter.addEvent(element, "keypress", keypressEventHandler);
-            RegFormatter.addEvent(element, "beforeInput", beforeInputHandler);
-            //RegFormatter.addEvent(element, "input", inputEventHandler);
+            RegFormatter.addEvent(element, "beforeinput", beforeInputHandler);
+            RegFormatter.addEvent(element, "input", inputEventHandler);
             RegFormatter.addEvent(element, "paste", pasteEventHandler);
             RegFormatter.addEvent(element, "cut", cutEventHandler);
         }
@@ -163,7 +173,8 @@
             if (self.element) {
                 RegFormatter.removeEvent(self.element, "keydown", keydownEventHandler);
                 RegFormatter.removeEvent(self.element, "keypress", keypressEventHandler);
-                //RegFormatter.removeEvent(self.element, "input", inputEventHandler);
+                RegFormatter.removeEvent(self.element, "beforeinput", beforeInputHandler);
+                RegFormatter.removeEvent(self.element, "input", inputEventHandler);
                 RegFormatter.removeEvent(self.element, "paste", pasteEventHandler);
                 RegFormatter.removeEvent(self.element, "cut", cutEventHandler);
             }
