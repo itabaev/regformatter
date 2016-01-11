@@ -40,14 +40,15 @@
                 });
             </code>
             <script>
-                var phoneElem = document.getElementById("phone");
-                var phone = new RegFormatter(phoneElem, {
-                    formats: [
-                        "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
-                        "%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
-                        "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
-                    ]
-                });
+                $(function() {
+                    var phone = $("#phone").regformatter({
+                        formats: [
+                            "+%7% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
+                            "%8% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%",
+                            "%\\d{2}% (%[0-9]{3}%) %\\d{3}%-%\\d{2}%-%\\d{2}%"
+                        ]
+                    });
+                })
             </script>
         </div>
         <br />
@@ -61,7 +62,6 @@
                     $('#cardnumber').regformatter({
                         format: "%\\d{4}% %\\d{4}% %\\d{4}% %\\d{4}% %\\d{2}%"
                     });
-                    console.log($('#cardnumber').regformatter().value());
                 })
             </script>
         </div>
@@ -76,7 +76,6 @@
                     $('#carddate').regformatter({
                         format: "%[01]\\d%\/%\\d{2}%"
                     });
-                    console.log($('#carddate').regformatter().value());
                 })
             </script>
         </div>
@@ -94,7 +93,7 @@
                 var testGroup = document.getElementById("testGroup");
                 var testFormat = document.getElementById("testFormat");
                 var testField = document.getElementById("testField");
-                var test = new RegFormatter(testField, {
+                var test = $("#testField").regformatter({
                     format: testFormat.value
                 });
                 var reset = function () {
@@ -104,7 +103,7 @@
                         var v = test.write(val, "", 0, 0);
                         if (v) {
                             testField.value = v.value;
-                            RegFormatter.setCaretPosition(testField, v.position + 1);
+                            RegFormatter.setCaretPosition(testField, v.position);
                         }
                         testGroup.className = "form-group";
                     } catch (e) {
@@ -153,16 +152,14 @@
         </p>
         <div class="well well-sm" id="phoneValue"></div>
         <script>
-            var phoneValue = document.getElementById("phoneValue");
-            phoneValue.innerHTML = phone.value();
-            if (phoneElem.addEventListener)
-                phoneElem.addEventListener("keyup", function () {
-                    phoneValue.innerHTML = phone.value();
+            $(function() {
+                var phoneValue = $("#phoneValue");
+                var phone = $("#phone").regformatter();
+                phoneValue.html(phone.value());
+                phone.on("keyup", function () {
+                    phoneValue.html(phone.value());
                 });
-            else
-                phoneElem.attachEvent("onkeyup", function () {
-                    phoneValue.innerHTML = phone.value();
-                });
+            })
         </script>
         <br />
 
@@ -177,19 +174,19 @@
         </p>
         <div class="well well-sm" id="phoneWrite"></div>
         <script>
-            var phoneWrite = document.getElementById("phoneWrite");
-            var write = function () {
-                var obj = phone.write("7", phoneElem.value, 0);
-                if (obj)
-                    phoneWrite.innerHTML = "{ value: \"" + obj.value + "\", position: " + obj.position + " }";
-                else
-                    phoneWrite.innerHTML = "null";
-            };
-            write();
-            if (phoneElem.addEventListener)
-                phoneElem.addEventListener("keyup", write);
-            else
-                phoneElem.attachEvent("onkeyup", write);
+            $(function () {
+                var phoneWrite = $("#phoneWrite");
+                var phone = $("#phone").regformatter();
+                var write = function () {
+                    var obj = phone.write("7", phone.val(), 0);
+                    if (obj)
+                        phoneWrite.html("{ value: \"" + obj.value + "\", position: " + obj.position + " }");
+                    else
+                        phoneWrite.html("null");
+                };
+                write();
+                phone.on("keyup", write);
+            })
         </script>
         <br />
 
@@ -208,7 +205,7 @@
             i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
                 (i[r].q = i[r].q || []).push(arguments)
             }, i[r].l = 1 * new Date(); a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
         })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
         ga('create', 'UA-64125020-1', 'auto');

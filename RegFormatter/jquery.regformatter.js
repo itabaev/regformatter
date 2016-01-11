@@ -1,4 +1,4 @@
-﻿var RegFormatter = (function () {
+﻿(function ($) {
     if (!Array.prototype.indexOf) {
         Array.prototype.indexOf = function (searchElement, fromIndex) {
             for (var i = (fromIndex || 0) ; i < this.length; i++)
@@ -90,7 +90,7 @@
             RegFormatter.preventEvent(e);
         };
 
-        var beforeInputHandler = function(e) {
+        var beforeInputHandler = function (e) {
             if (!self.element)
                 return;
             e = e || window.event;
@@ -171,23 +171,25 @@
         }
 
         if (element) {
-            RegFormatter.addEvent(element, "keydown", keydownEventHandler);
-            RegFormatter.addEvent(element, "keypress", keypressEventHandler);
-            RegFormatter.addEvent(element, "beforeinput", beforeInputHandler);
-            RegFormatter.addEvent(element, "input", inputEventHandler);
-            RegFormatter.addEvent(element, "paste", pasteEventHandler);
-            RegFormatter.addEvent(element, "cut", cutEventHandler);
+            $(element)
+                .on("keydown", keydownEventHandler)
+                .on("keypress", keypressEventHandler)
+                .on("beforeinput", beforeInputHandler)
+                .on("input", inputEventHandler)
+                .on("paste", pasteEventHandler)
+                .on("cut", cutEventHandler);
         }
 
         RegFormatter.prototype.destroy = function () {
             var self = this;
             if (self.element) {
-                RegFormatter.removeEvent(self.element, "keydown", keydownEventHandler);
-                RegFormatter.removeEvent(self.element, "keypress", keypressEventHandler);
-                RegFormatter.removeEvent(self.element, "beforeinput", beforeInputHandler);
-                RegFormatter.removeEvent(self.element, "input", inputEventHandler);
-                RegFormatter.removeEvent(self.element, "paste", pasteEventHandler);
-                RegFormatter.removeEvent(self.element, "cut", cutEventHandler);
+                $(self.element)
+                    .off("keydown", keydownEventHandler)
+                    .off("keypress", keypressEventHandler)
+                    .off("beforeinput", beforeInputHandler)
+                    .off("input", inputEventHandler)
+                    .off("paste", pasteEventHandler)
+                    .off("cut", cutEventHandler);
             }
             self.formats = null;
             self.patterns = null;
@@ -200,25 +202,7 @@
             delete self;
         }
     }
-
-    RegFormatter.addEvent = function (elem, type, func) {
-        if (!elem || !type || !func)
-            return;
-        if (elem.addEventListener)
-            elem.addEventListener(type, func);
-        else
-            elem.attachEvent("on" + type, func);
-    }
-
-    RegFormatter.removeEvent = function (elem, type, func) {
-        if (!elem || !type || !func)
-            return;
-        if (elem.removeEventListener)
-            elem.removeEventListener(type, func);
-        else
-            elem.detachEvent("on" + type, func);
-    }
-
+    
     RegFormatter.preventEvent = function (e) {
         if (!e)
             return;
@@ -593,10 +577,7 @@
         }
         return null;
     };
-    return RegFormatter;
-})();
 
-(function ($) {
     $.fn.regformatter = function (obj) {
         if (obj) {
             this.each(function () {
