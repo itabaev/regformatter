@@ -137,10 +137,20 @@
                 return;
             e = e || window.event;
             sel = RegFormatter.getCaretPosition(self.element);
-            var clipboardData = e.clipboardData || window.clipboardData;
+            var clipboardData;
+            try { //for Edge
+                clipboardData = e.clipboardData || window.clipboardData;
+            } catch (exception) {
+                clipboardData = window.clipboardData;
+            }
             if (!clipboardData || !clipboardData.getData)
                 return;
-            var text = clipboardData.getData("text/plain");
+            var text = '';
+            if ("ActiveXObject" in window) { // detect IE
+                text = clipboardData.getData("text");
+            } else {
+                text = clipboardData.getData("text/plain");
+            }
             if (text) {
                 var positionStart = sel.selectionStart;
                 var positionEnd = sel.selectionEnd;
@@ -170,6 +180,33 @@
             }
         }
 
+        var dropEventHandler = function (e) {
+            if (!self.element)
+                return;
+            e = e || window.event;
+            sel = RegFormatter.getCaretPosition(self.element);
+            var dataTransfer = e.dataTransfer;
+            if (!dataTransfer || !dataTransfer.getData)
+                return;
+            var text = '';
+            if ("ActiveXObject" in window) { // detect IE
+                text = dataTransfer.getData("text");
+            } else {
+                text = dataTransfer.getData("text/plain");
+            }
+            if (text) {
+                var positionStart = sel.selectionStart;
+                var positionEnd = sel.selectionEnd;
+                var val = self.write(text, self.element.value, positionStart, positionEnd === positionStart ? null : positionEnd);
+                if (val) {
+                    self.element.value = val.value;
+                    self.oldValue = val.value;
+                    RegFormatter.setCaretPosition(self.element, val.position);
+                }
+            }
+            RegFormatter.preventEvent(e);
+        }
+
         if (element) {
             RegFormatter.addEvent(element, "keydown", keydownEventHandler);
             RegFormatter.addEvent(element, "keypress", keypressEventHandler);
@@ -177,6 +214,7 @@
             RegFormatter.addEvent(element, "input", inputEventHandler);
             RegFormatter.addEvent(element, "paste", pasteEventHandler);
             RegFormatter.addEvent(element, "cut", cutEventHandler);
+            RegFormatter.addEvent(element, "drop", dropEventHandler);
         }
 
         RegFormatter.prototype.destroy = function () {
@@ -188,6 +226,7 @@
                 RegFormatter.removeEvent(self.element, "input", inputEventHandler);
                 RegFormatter.removeEvent(self.element, "paste", pasteEventHandler);
                 RegFormatter.removeEvent(self.element, "cut", cutEventHandler);
+                RegFormatter.removeEvent(self.element, "drop", dropEventHandler);
             }
             self.formats = null;
             self.patterns = null;
