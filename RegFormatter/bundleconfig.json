@@ -1,0 +1,14 @@
+[
+  {
+    "outputFileName": "jquery.regformatter.js",
+    "inputFiles": [
+      "jquery.regformatter.js"
+    ]
+  },
+  {
+    "outputFileName": "regformatter.js",
+    "inputFiles": [
+      "regformatter.js"
+    ]
+  }
+]
